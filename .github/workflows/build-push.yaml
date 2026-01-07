@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-    tags:
-      - 'v*'
   pull_request:
     branches:
       - main
@@ -36,19 +34,48 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Generate CalVer version
+        id: calver
+        run: |
+          # Get today's date in YYYY.MM.DD format
+          DATE_PREFIX=$(date -u +"%Y.%m.%d")
+          echo "date_prefix=${DATE_PREFIX}" >> $GITHUB_OUTPUT
+
+          # Query existing tags for today to find the next build number
+          # Use GitHub API to list package versions
+          EXISTING_TAGS=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/users/${{ github.repository_owner }}/packages/container/$(basename ${{ github.repository }})/versions?per_page=100" \
+            2>/dev/null | jq -r '.[].metadata.container.tags[]' 2>/dev/null || echo "")
+
+          # Find the highest build number for today
+          MAX_BUILD=0
+          for tag in $EXISTING_TAGS; do
+            if [[ $tag =~ ^${DATE_PREFIX}\.([0-9]+)$ ]]; then
+              BUILD_NUM=${BASH_REMATCH[1]}
+              if [ "$BUILD_NUM" -gt "$MAX_BUILD" ]; then
+                MAX_BUILD=$BUILD_NUM
+              fi
+            fi
+          done
+
+          # Increment for next build
+          NEXT_BUILD=$((MAX_BUILD + 1))
+
+          # Format with leading zeros (01, 02, ..., 99)
+          CALVER="${DATE_PREFIX}.$(printf '%02d' $NEXT_BUILD)"
+          echo "version=${CALVER}" >> $GITHUB_OUTPUT
+          echo "Generated CalVer: ${CALVER}"
+
       - name: Extract metadata for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            # On push to main: latest + sha
+            # CalVer tag (primary)
+            type=raw,value=${{ steps.calver.outputs.version }},enable={{is_default_branch}}
+            # Latest tag
             type=raw,value=latest,enable={{is_default_branch}}
-            type=sha,prefix=,format=short
-            # On tag: semver
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
@@ -66,6 +93,8 @@ jobs:
         run: |
           echo "## Docker Image Published" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** \`${{ steps.calver.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Tags:**" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
@@ -73,5 +102,5 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Pull command:**" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          echo "docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.calver.outputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
