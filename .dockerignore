@@ -41,6 +41,6 @@ README.md
 CHANGELOG.md
 LICENSE
 
-# Convex local development
-convex/_generated
+# Convex local development (keep _generated for builds)
+# convex/_generated  # Needed for TypeScript compilation
 .convex
