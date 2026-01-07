@@ -16,6 +16,10 @@ export interface AppConfig {
   // Core
   convexUrl: string;
 
+  // App metadata
+  version: string;
+  environment: string;
+
   // Feature flags (add more as needed)
   // featureNewUi?: string;
   // featureAnalytics?: string;
@@ -26,9 +30,6 @@ export interface AppConfig {
   // Third-party integrations (add more as needed)
   // sentryDsn?: string;
   // analyticsId?: string;
-
-  // Environment identification
-  // environment?: string;
 }
 
 // Extend Window interface for TypeScript
@@ -73,12 +74,9 @@ export const config: AppConfig = {
   // Core - Convex backend URL
   convexUrl: getConfigValue("convexUrl", "VITE_CONVEX_URL"),
 
-  // Add more config values as needed:
-  // featureNewUi: getConfigValue('featureNewUi', 'VITE_FEATURE_NEW_UI', 'false'),
-  // apiBaseUrl: getConfigValue('apiBaseUrl', 'VITE_API_BASE_URL'),
-  // sentryDsn: getConfigValue('sentryDsn', 'VITE_SENTRY_DSN'),
-  // analyticsId: getConfigValue('analyticsId', 'VITE_ANALYTICS_ID'),
-  // environment: getConfigValue('environment', 'VITE_ENVIRONMENT', 'development'),
+  // App metadata
+  version: getConfigValue("version", "VITE_VERSION", "dev"),
+  environment: getConfigValue("environment", "VITE_ENVIRONMENT", "development"),
 };
 
 /**

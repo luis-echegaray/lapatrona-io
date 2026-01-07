@@ -1,5 +1,6 @@
 import { createRootRoute, Link, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
+import { config } from '../config'
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -17,6 +18,12 @@ function RootComponent() {
             About
           </Link>
         </nav>
+        <div className="version-badge">
+          v{config.version}
+          {config.environment !== 'production' && (
+            <span className="env-badge">{config.environment}</span>
+          )}
+        </div>
       </header>
       <main className="app-main">
         <Outlet />
@@ -32,12 +39,28 @@ function RootComponent() {
           padding: 1rem;
           background: #1a1a1a;
           border-bottom: 1px solid #333;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
         }
         .app-header nav {
           display: flex;
           gap: 1rem;
-          max-width: 1200px;
-          margin: 0 auto;
+        }
+        .version-badge {
+          font-size: 0.75rem;
+          color: #888;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+        .env-badge {
+          background: #646cff;
+          color: white;
+          padding: 0.125rem 0.5rem;
+          border-radius: 4px;
+          font-size: 0.625rem;
+          text-transform: uppercase;
         }
         .nav-link {
           padding: 0.5rem 1rem;
