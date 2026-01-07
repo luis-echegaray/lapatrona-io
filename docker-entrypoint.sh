@@ -5,6 +5,14 @@ set -e
 # This enables "build once, deploy anywhere" pattern
 
 CONFIG_FILE="/usr/share/nginx/html/config.js"
+VERSION_FILE="/usr/share/nginx/html/VERSION"
+
+# Read version from baked-in file (single source of truth)
+# This was written during Docker build from the CalVer tag
+if [ -f "$VERSION_FILE" ] && [ -z "$APP_VERSION" ]; then
+  export APP_VERSION=$(cat "$VERSION_FILE")
+  echo "Version loaded from image: $APP_VERSION"
+fi
 
 echo "Generating runtime configuration..."
 

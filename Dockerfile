@@ -1,6 +1,9 @@
 # Build stage - compile TypeScript and bundle with Vite
 FROM node:20-alpine AS builder
 
+# Version is passed from GitHub Actions (CalVer format: YYYY.MM.DD.NN)
+ARG APP_VERSION=dev
+
 WORKDIR /app
 
 # Copy package files for dependency installation
@@ -15,6 +18,9 @@ COPY . .
 # Build the application (outputs to /app/dist)
 # Note: We DON'T set VITE_* env vars here - they'll be injected at runtime
 RUN npm run build
+
+# Write version to file (single source of truth)
+RUN echo "${APP_VERSION}" > /app/dist/VERSION
 
 # Runtime stage - serve with nginx
 FROM nginx:alpine
