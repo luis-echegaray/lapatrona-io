@@ -12,6 +12,9 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# Generate Convex types (required for TypeScript compilation)
+RUN npx convex codegen
+
 # Build the application (outputs to /app/dist)
 # Note: We DON'T set VITE_* env vars here - they'll be injected at runtime
 RUN npm run build
