@@ -18,16 +18,18 @@ function RootComponent() {
             About
           </Link>
         </nav>
+      </header>
+      <main className="app-main">
+        <Outlet />
+      </main>
+      <footer className="app-footer">
         <div className="version-badge">
           v{config.version}
           {config.environment !== 'production' && (
             <span className="env-badge">{config.environment}</span>
           )}
         </div>
-      </header>
-      <main className="app-main">
-        <Outlet />
-      </main>
+      </footer>
       {import.meta.env.DEV && <TanStackRouterDevtools />}
       <style>{`
         .app {
@@ -47,19 +49,26 @@ function RootComponent() {
           display: flex;
           gap: 1rem;
         }
+        .app-footer {
+          padding: 0.5rem 1rem;
+          background: #1a1a1a;
+          border-top: 1px solid #333;
+          display: flex;
+          justify-content: flex-end;
+        }
         .version-badge {
-          font-size: 0.75rem;
-          color: #888;
+          font-size: 0.56rem;
+          color: #666;
           display: flex;
           align-items: center;
-          gap: 0.5rem;
+          gap: 0.375rem;
         }
         .env-badge {
           background: #646cff;
           color: white;
-          padding: 0.125rem 0.5rem;
-          border-radius: 4px;
-          font-size: 0.625rem;
+          padding: 0.094rem 0.375rem;
+          border-radius: 3px;
+          font-size: 0.47rem;
           text-transform: uppercase;
         }
         .nav-link {
@@ -85,6 +94,10 @@ function RootComponent() {
           .app-header {
             background: #f5f5f5;
             border-bottom-color: #ddd;
+          }
+          .app-footer {
+            background: #f5f5f5;
+            border-top-color: #ddd;
           }
           .nav-link:hover {
             background: #e0e0e0;
