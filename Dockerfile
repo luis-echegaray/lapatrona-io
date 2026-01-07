@@ -9,11 +9,8 @@ COPY package.json package-lock.json ./
 # Install dependencies
 RUN npm ci
 
-# Copy source code
+# Copy source code (includes convex/_generated types)
 COPY . .
-
-# Generate Convex types (required for TypeScript compilation)
-RUN npx convex codegen
 
 # Build the application (outputs to /app/dist)
 # Note: We DON'T set VITE_* env vars here - they'll be injected at runtime

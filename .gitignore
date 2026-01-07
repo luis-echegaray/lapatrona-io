@@ -24,8 +24,8 @@ yarn-error.log*
 # OS
 .DS_Store
 
-# Convex generated files
-convex/_generated
+# Convex generated files - committed for Docker builds
+# convex/_generated
 
 # Environment
 .env
