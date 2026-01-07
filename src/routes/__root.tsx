@@ -1,6 +1,7 @@
 import { createRootRoute, Link, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 import { config } from '../config'
+import { UpdateNotification } from '../components/UpdateNotification'
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -30,6 +31,7 @@ function RootComponent() {
           )}
         </div>
       </footer>
+      <UpdateNotification checkInterval={60_000} />
       {import.meta.env.DEV && <TanStackRouterDevtools />}
       <style>{`
         .app {
